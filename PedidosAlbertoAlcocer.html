@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Online</title>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        // Inicializa EmailJS con tu API Key (Public Key)
+        (function() {
+            emailjs.init("2H1ibP_4DCWAfHY6T"); // Reemplázalo con tu Public Key de EmailJS
+        })();
+
+        function enviarFormulario() {
+            let productos = document.querySelectorAll(".product");
+            let observacion = document.getElementById("observacion").value.trim();
+            let semanaSeleccionada = document.getElementById("semanaPedido").value;
+            let fechaPedido = document.getElementById("fechaPedido").textContent;
+
+            if (!semanaSeleccionada) {
+                alert("❌ Selecciona una semana antes de enviar el pedido.");
+                return;
+            }
+
+            let mensaje = `📅 Fecha del pedido: ${fechaPedido}\n📅 Semana seleccionada: ${semanaSeleccionada}\n\n📦 Pedido:\n`;
+
+            let hayProductos = false;
+
+            productos.forEach((producto, index) => {
+                let nombre = producto.querySelector("select[name='producto']").value;
+                let unidad = producto.querySelector("select[name='unidad']").value;
+                let cantidad = producto.querySelector("input[name='cantidad']").value.trim();
+
+                if (nombre && unidad && cantidad) {
+                    mensaje += `${index + 1}. ${nombre} - ${cantidad} ${unidad}\n`;
+                    hayProductos = true;
+                }
+            });
+
+            if (!hayProductos) {
+                alert("❌ Debes agregar al menos un producto antes de enviar.");
+                return;
+            }
+
+            mensaje += `\n📝 Observación:\n${observacion || "Sin observaciones."}`;
+
+            // Enviar los datos usando EmailJS
+            emailjs.send("service_woj07qd", "template_64dmxuq", {
+                message: mensaje
+            }).then(function(response) {
+                alert("✅ Su pedido ha sido enviado con éxito.");
+                console.log("SUCCESS!", response.status, response.text);
+                limpiarFormulario();
+            }, function(error) {
+                alert("❌ Error al enviar el pedido. Revisa la consola para más detalles.");
+                console.log("FAILED...", error);
+            });
+        }
+
+        function limpiarFormulario() {
+            document.getElementById("observacion").value = "";
+            document.getElementById("productos-bm2").innerHTML = "";
+            document.getElementById("productos-limpieza").innerHTML = "";
+            agregarCampo("productos-bm2");
+            agregarCampo("productos-limpieza");
+        }
+
+        function establecerFechaPedido() {
+            let hoy = new Date();
+            let fechaHoy = hoy.toLocaleDateString("es-ES");
+            document.getElementById("fechaPedido").textContent = fechaHoy;
+        }
+
+        function generarSemanas() {
+            let selectSemana = document.getElementById("semanaPedido");
+            let hoy = new Date();
+
+            selectSemana.innerHTML = "";
+
+            for (let i = 0; i < 10; i++) {
+                let lunes = new Date(hoy);
+                lunes.setDate(hoy.getDate() + ((1 + 7 * i) - hoy.getDay()));
+
+                let viernes = new Date(lunes);
+                viernes.setDate(lunes.getDate() + 4);
+
+                let opcion = document.createElement("option");
+                opcion.value = `${lunes.toLocaleDateString("es-ES")} - ${viernes.toLocaleDateString("es-ES")}`;
+                opcion.textContent = `Semana: ${lunes.toLocaleDateString("es-ES")} - ${viernes.toLocaleDateString("es-ES")}`;
+                selectSemana.appendChild(opcion);
+            }
+        }
+
+        function agregarCampo(seccionId) {
+            let contenedor = document.getElementById(seccionId);
+            let nuevoCampo = document.createElement("div");
+            nuevoCampo.classList.add("product");
+
+            nuevoCampo.innerHTML = `
+                <select name="producto">
+                    <option value="" disabled selected>Seleccione un producto</option>
+                    <option>Arroz</option>
+                    <option>Garbanzos</option>
+                    <option>Desinfectante</option>
+                    <option>Lejías</option>
+                </select>
+                <select name="unidad">
+                    <option value="" disabled selected>Seleccione una unidad</option>
+                    <option>kg</option>
+                    <option>botes</option>
+                    <option>cajas</option>
+                </select>
+                <input type="number" name="cantidad" placeholder="Cantidad" min="1">
+            `;
+
+            contenedor.appendChild(nuevoCampo);
+        }
+
+        function eliminarCampo(seccionId) {
+            let contenedor = document.getElementById(seccionId);
+            if (contenedor.children.length > 1) {
+                contenedor.removeChild(contenedor.lastChild);
+            } else {
+                alert("Debe haber al menos un producto en la sección.");
+            }
+        }
+
+        function iniciarFormulario() {
+            establecerFechaPedido();
+            generarSemanas();
+            agregarCampo('productos-bm2');
+            agregarCampo('productos-limpieza');
+        }
+
+        window.onload = iniciarFormulario;
+    </script>
+ <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background-color: #555;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .product {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            align-items: center;
+            background-color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .product select, .product input {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            cursor: pointer;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            width: 45%;
+        }
+
+        .btn-add {
+            background-color: green;
+        }
+
+        .btn-remove {
+            background-color: red;
+        }
+
+        .btn-submit {
+            background-color: green;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .observacion-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .observacion-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 70px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+            font-size: 14px;
+        }
+
+        @media (max-width: 500px) {
+            .product {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .buttons-container {
+                justify-content: center;
+            }
+
+            textarea {
+                height: 90px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h2>Pedido on-line Alberto Acocer</h2>
+            <p>Fecha del pedido: <span id="fechaPedido"></span></p>
+            <p>Semana:
+                <select id="semanaPedido"></select>
+            </p>
+        </div>
+
+        <div class="section">BM2</div>
+        <div id="productos-bm2"></div>
+        <div class="buttons-container">
+            <button class="btn btn-add" onclick="agregarCampo('productos-bm2')">+</button>
+            <button class="btn btn-remove" onclick="eliminarCampo('productos-bm2')">-</button>
+        </div>
+
+        <div class="section">LIMPIEZA</div>
+        <div id="productos-limpieza"></div>
+        <div class="buttons-container">
+            <button class="btn btn-add" onclick="agregarCampo('productos-limpieza')">+</button>
+            <button class="btn btn-remove" onclick="eliminarCampo('productos-limpieza')">-</button>
+        </div>
+
+        <div class="observacion-container">
+            <label for="observacion">Observación</label>
+            <textarea id="observacion" placeholder="Escribe aquí cualquier comentario adicional..."></textarea>
+        </div>
+
+        <button class="btn btn-submit" onclick="enviarFormulario()">Enviar Pedido</button>
+    </div>
+
+</body>
+</html>
