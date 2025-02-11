@@ -8,54 +8,73 @@
     <script>
         // Inicializa EmailJS con tu API Key (Public Key)
         (function() {
-            emailjs.init("2H1ibP_4DCWAfHY6T"); // Reemplázalo con tu Public Key de EmailJS
-        })();
+    emailjs.init("2H1ibP_4DCWAfHY6T"); // Reemplázalo con tu Public Key de EmailJS
+})();
 
-        function enviarFormulario() {
-            let productos = document.querySelectorAll(".product");
-            let observacion = document.getElementById("observacion").value.trim();
-            let semanaSeleccionada = document.getElementById("semanaPedido").value;
-            let fechaPedido = document.getElementById("fechaPedido").textContent;
+function enviarFormulario() {
+    let secciones = document.querySelectorAll(".section"); // Detecta todas las secciones dinámicamente
+    let observacion = document.getElementById("observacion").value.trim();
+    let semanaSeleccionada = document.getElementById("semanaPedido").value;
+    let fechaPedido = document.getElementById("fechaPedido").textContent;
 
-            if (!semanaSeleccionada) {
-                alert("❌ Selecciona una semana antes de enviar el pedido.");
-                return;
-            }
+    if (!semanaSeleccionada) {
+        alert("❌ Selecciona una semana antes de enviar el pedido.");
+        return;
+    }
 
-            let mensaje = `📅 Fecha del pedido: ${fechaPedido}\n📅 Semana seleccionada: ${semanaSeleccionada}\n\n📦 Pedido:\n`;
+    let mensaje = `📅 Fecha del pedido: ${fechaPedido}\n📅 Semana seleccionada: ${semanaSeleccionada}\n\n📦 Pedido CEIP Alberto Alcocer:\n`;
 
-            let hayProductos = false;
+    let categorias = {}; // Objeto para almacenar productos por sección
+    let hayProductos = false;
 
-            productos.forEach((producto, index) => {
-                let nombre = producto.querySelector("select[name='producto']").value;
-                let unidad = producto.querySelector("select[name='unidad']").value;
-                let cantidad = producto.querySelector("input[name='cantidad']").value.trim();
+    // Recorrer cada sección para obtener sus productos
+    secciones.forEach(seccion => {
+        let nombreSeccion = seccion.textContent.trim(); // Obtener el nombre de la sección
+        let productos = seccion.nextElementSibling.querySelectorAll(".product"); // Buscar los productos dentro de la sección
 
-                if (nombre && unidad && cantidad) {
-                    mensaje += `${index + 1}. ${nombre} - ${cantidad} ${unidad}\n`;
-                    hayProductos = true;
+        productos.forEach(producto => {
+            let nombre = producto.querySelector("select[name='producto']").value;
+            let unidad = producto.querySelector("select[name='unidad']").value;
+            let cantidad = producto.querySelector("input[name='cantidad']").value.trim();
+
+            if (nombre && unidad && cantidad) {
+                if (!categorias[nombreSeccion]) {
+                    categorias[nombreSeccion] = [];
                 }
-            });
-
-            if (!hayProductos) {
-                alert("❌ Debes agregar al menos un producto antes de enviar.");
-                return;
+                categorias[nombreSeccion].push(`${nombre} - ${cantidad} ${unidad}`);
+                hayProductos = true;
             }
+        });
+    });
 
-            mensaje += `\n📝 Observación:\n${observacion || "Sin observaciones."}`;
+    if (!hayProductos) {
+        alert("❌ Debes agregar al menos un producto antes de enviar.");
+        return;
+    }
 
-            // Enviar los datos usando EmailJS
-            emailjs.send("service_woj07qd", "template_64dmxuq", {
-                message: mensaje
-            }).then(function(response) {
-                alert("✅ Su pedido ha sido enviado con éxito.");
-                console.log("SUCCESS!", response.status, response.text);
-                limpiarFormulario();
-            }, function(error) {
-                alert("❌ Error al enviar el pedido. Revisa la consola para más detalles.");
-                console.log("FAILED...", error);
-            });
-        }
+    // Construir el mensaje con categorías separadas
+    for (let categoria in categorias) {
+        mensaje += `\n🔹 *${categoria}*:\n`;
+        categorias[categoria].forEach((producto, index) => {
+            mensaje += `   ${index + 1}. ${producto}\n`;
+        });
+    }
+
+    mensaje += `\n📝 Observación:\n${observacion || "Sin observaciones."}`;
+
+    // Enviar los datos usando EmailJS
+    emailjs.send("service_woj07qd", "template_64dmxuq", {
+        message: mensaje
+    }).then(function(response) {
+        alert("✅ Su pedido ha sido enviado con éxito.");
+        console.log("SUCCESS!", response.status, response.text);
+        limpiarFormulario();
+    }, function(error) {
+        alert("❌ Error al enviar el pedido. Revisa la consola para más detalles.");
+        console.log("FAILED...", error);
+    });
+}
+
 
         function limpiarFormulario() {
             document.getElementById("observacion").value = "";
@@ -71,25 +90,36 @@
             document.getElementById("fechaPedido").textContent = fechaHoy;
         }
 
-        function generarSemanas() {
-            let selectSemana = document.getElementById("semanaPedido");
-            let hoy = new Date();
+ function generarSemanas() {
+    let selectSemana = document.getElementById("semanaPedido");
+    let hoy = new Date();
 
-            selectSemana.innerHTML = "";
+    selectSemana.innerHTML = ""; // Limpiar opciones previas
 
-            for (let i = 0; i < 20; i++) {
-                let lunes = new Date(hoy);
-                lunes.setDate(hoy.getDate() + ((1 + 7 * i) - hoy.getDay()));
+    // Función auxiliar para obtener el nombre del día en español
+    function obtenerNombreDia(fecha) {
+        const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        return dias[fecha.getDay()];
+    }
 
-                let viernes = new Date(lunes);
-                viernes.setDate(lunes.getDate() + 4);
+    for (let i = 0; i < 15; i++) {
+        let martes = new Date(hoy);
+        let diaActual = hoy.getDay(); // Obtener el día actual de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
 
-                let opcion = document.createElement("option");
-                opcion.value = `${lunes.toLocaleDateString("es-ES")} - ${viernes.toLocaleDateString("es-ES")}`;
-                opcion.textContent = `Semana: ${lunes.toLocaleDateString("es-ES")} - ${viernes.toLocaleDateString("es-ES")}`;
-                selectSemana.appendChild(opcion);
-            }
-        }
+        // Ajustar para encontrar el martes de la semana actual o la siguiente
+        let diasParaMartes = (diaActual <= 2) ? (2 - diaActual) : (9 - diaActual);
+        martes.setDate(hoy.getDate() + diasParaMartes + (i * 7)); 
+
+        let lunes = new Date(martes);
+        lunes.setDate(martes.getDate() + 6); // Sumar 6 días para llegar al lunes siguiente
+
+        let opcion = document.createElement("option");
+        opcion.value = `${martes.toLocaleDateString("es-ES")} - ${lunes.toLocaleDateString("es-ES")}`;
+        opcion.textContent = `${obtenerNombreDia(martes)} ${martes.getDate()} - ${obtenerNombreDia(lunes)} ${lunes.getDate()}`;
+        
+        selectSemana.appendChild(opcion);
+    }
+}
 
         function agregarCampo(seccionId) {
             let contenedor = document.getElementById(seccionId);
@@ -134,7 +164,7 @@
 
         window.onload = iniciarFormulario;
     </script>
- <style>
+  <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
