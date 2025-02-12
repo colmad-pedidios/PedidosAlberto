@@ -5,166 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedido Online</title>
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-    <script>
-        // Inicializa EmailJS con tu API Key (Public Key)
-        (function() {
-    emailjs.init("2H1ibP_4DCWAfHY6T"); // Reemplázalo con tu Public Key de EmailJS
-})();
-
-function enviarFormulario() {
-    let secciones = document.querySelectorAll(".section"); // Detecta todas las secciones dinámicamente
-    let observacion = document.getElementById("observacion").value.trim();
-    let semanaSeleccionada = document.getElementById("semanaPedido").value;
-    let fechaPedido = document.getElementById("fechaPedido").textContent;
-
-    if (!semanaSeleccionada) {
-        alert("❌ Selecciona una semana antes de enviar el pedido.");
-        return;
-    }
-
-    let mensaje = `📅 Fecha del pedido: ${fechaPedido}\n📅 Semana seleccionada: ${semanaSeleccionada}\n\n📦 Pedido CEIP Alberto Alcocer:\n`;
-
-    let categorias = {}; // Objeto para almacenar productos por sección
-    let hayProductos = false;
-
-    // Recorrer cada sección para obtener sus productos
-    secciones.forEach(seccion => {
-        let nombreSeccion = seccion.textContent.trim(); // Obtener el nombre de la sección
-        let productos = seccion.nextElementSibling.querySelectorAll(".product"); // Buscar los productos dentro de la sección
-
-        productos.forEach(producto => {
-            let nombre = producto.querySelector("select[name='producto']").value;
-            let unidad = producto.querySelector("select[name='unidad']").value;
-            let cantidad = producto.querySelector("input[name='cantidad']").value.trim();
-
-            if (nombre && unidad && cantidad) {
-                if (!categorias[nombreSeccion]) {
-                    categorias[nombreSeccion] = [];
-                }
-                categorias[nombreSeccion].push(`${nombre} - ${cantidad} ${unidad}`);
-                hayProductos = true;
-            }
-        });
-    });
-
-    if (!hayProductos) {
-        alert("❌ Debes agregar al menos un producto antes de enviar.");
-        return;
-    }
-
-    // Construir el mensaje con categorías separadas
-    for (let categoria in categorias) {
-        mensaje += `\n🔹 *${categoria}*:\n`;
-        categorias[categoria].forEach((producto, index) => {
-            mensaje += `   ${index + 1}. ${producto}\n`;
-        });
-    }
-
-    mensaje += `\n📝 Observación:\n${observacion || "Sin observaciones."}`;
-
-    // Enviar los datos usando EmailJS
-    emailjs.send("service_woj07qd", "template_64dmxuq", {
-        message: mensaje
-    }).then(function(response) {
-        alert("✅ Su pedido ha sido enviado con éxito.");
-        console.log("SUCCESS!", response.status, response.text);
-        limpiarFormulario();
-    }, function(error) {
-        alert("❌ Error al enviar el pedido. Revisa la consola para más detalles.");
-        console.log("FAILED...", error);
-    });
-}
-
-
-        function limpiarFormulario() {
-            document.getElementById("observacion").value = "";
-            document.getElementById("productos-bm2").innerHTML = "";
-            document.getElementById("productos-limpieza").innerHTML = "";
-            agregarCampo("productos-bm2");
-            agregarCampo("productos-limpieza");
-        }
-
-        function establecerFechaPedido() {
-            let hoy = new Date();
-            let fechaHoy = hoy.toLocaleDateString("es-ES");
-            document.getElementById("fechaPedido").textContent = fechaHoy;
-        }
-
- function generarSemanas() {
-    let selectSemana = document.getElementById("semanaPedido");
-    let hoy = new Date();
-
-    selectSemana.innerHTML = ""; // Limpiar opciones previas
-
-    // Función auxiliar para obtener el nombre del día en español
-    function obtenerNombreDia(fecha) {
-        const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-        return dias[fecha.getDay()];
-    }
-
-    for (let i = 0; i < 15; i++) {
-        let martes = new Date(hoy);
-        let diaActual = hoy.getDay(); // Obtener el día actual de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
-
-        // Ajustar para encontrar el martes de la semana actual o la siguiente
-        let diasParaMartes = (diaActual <= 2) ? (2 - diaActual) : (9 - diaActual);
-        martes.setDate(hoy.getDate() + diasParaMartes + (i * 7)); 
-
-        let lunes = new Date(martes);
-        lunes.setDate(martes.getDate() + 6); // Sumar 6 días para llegar al lunes siguiente
-
-        let opcion = document.createElement("option");
-        opcion.value = `${martes.toLocaleDateString("es-ES")} - ${lunes.toLocaleDateString("es-ES")}`;
-        opcion.textContent = `${obtenerNombreDia(martes)} ${martes.getDate()} - ${obtenerNombreDia(lunes)} ${lunes.getDate()}`;
-        
-        selectSemana.appendChild(opcion);
-    }
-}
-
-        function agregarCampo(seccionId) {
-            let contenedor = document.getElementById(seccionId);
-            let nuevoCampo = document.createElement("div");
-            nuevoCampo.classList.add("product");
-
-            nuevoCampo.innerHTML = `
-                <select name="producto">
-                    <option value="" disabled selected>Seleccione un producto</option>
-                    <option>Arroz</option>
-                    <option>Garbanzos</option>
-                    <option>Desinfectante</option>
-                    <option>Lejías</option>
-                </select>
-                <select name="unidad">
-                    <option value="" disabled selected>Seleccione una unidad</option>
-                    <option>kg</option>
-                    <option>botes</option>
-                    <option>cajas</option>
-                </select>
-                <input type="number" name="cantidad" placeholder="Cantidad" min="1">
-            `;
-
-            contenedor.appendChild(nuevoCampo);
-        }
-
-        function eliminarCampo(seccionId) {
-            let contenedor = document.getElementById(seccionId);
-            if (contenedor.children.length > 1) {
-                contenedor.removeChild(contenedor.lastChild);
-            } else {
-                alert("Debe haber al menos un producto en la sección.");
-            }
-        }
-
-        function iniciarFormulario() {
-            establecerFechaPedido();
-            generarSemanas();
-            agregarCampo('productos-bm2');
-            agregarCampo('productos-limpieza');
-        }
-
-        window.onload = iniciarFormulario;
-    </script>
-  <style>
+    
+    <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -284,8 +126,223 @@ function enviarFormulario() {
                 height: 90px;
                 font-size: 16px;
             }
-        }
+			.section {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.section label {
+				font-size: 14px;
+				margin-left: 10px;
+			}
+
+			.section input {
+				padding: 5px;
+				border-radius: 3px;
+				border: 1px solid #ccc;
+			}
+			
+			.section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.category-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.date-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre "Fecha de entrega:" y el input */
+}
+
+.date-container label {
+    font-size: 14px;
+}
+
+.date-container input {
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+/* 🔹 RESPONSIVE: Ajusta el diseño en pantallas pequeñas */
+@media (max-width: 500px) {
+    .section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .date-container {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+					}
     </style>
+
+<script>
+    (function() {
+        emailjs.init("2H1ibP_4DCWAfHY6T");
+    })();
+
+    function agregarCampo(seccionId) {
+        let contenedor = document.getElementById(seccionId);
+        let nuevoCampo = document.createElement("div");
+        nuevoCampo.classList.add("product");
+
+        nuevoCampo.innerHTML = `
+            <select name="producto">
+                <option value="" disabled selected>Seleccione un producto</option>
+                <option>Arroz</option>
+                <option>Garbanzos</option>
+                <option>Desinfectante</option>
+                <option>Lejías</option>
+            </select>
+            <select name="unidad">
+                <option value="" disabled selected>Seleccione una unidad</option>
+                <option>kg</option>
+                <option>botes</option>
+                <option>cajas</option>
+            </select>
+            <input type="number" name="cantidad" placeholder="Cantidad" min="1">
+        `;
+
+        contenedor.appendChild(nuevoCampo);
+    }
+
+    function eliminarCampo(seccionId) {
+        let contenedor = document.getElementById(seccionId);
+        if (contenedor.children.length > 1) {
+            contenedor.removeChild(contenedor.lastChild);
+        } else {
+            alert("Debe haber al menos un producto en la sección.");
+        }
+    }
+
+    function establecerFechaPedido() {
+        let hoy = new Date();
+        let fechaHoy = hoy.toLocaleDateString("es-ES");
+        document.getElementById("fechaPedido").textContent = fechaHoy;
+    }
+
+    function generarSemanas() {
+        let selectSemana = document.getElementById("semanaPedido");
+        let hoy = new Date();
+
+        selectSemana.innerHTML = ""; // Limpiar opciones previas
+
+        function formatoFecha(fecha) {
+            let dia = fecha.getDate().toString().padStart(2, '0');
+            let mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            return `${dia}.${mes}`;
+        }
+
+        for (let i = 0; i < 15; i++) {
+            let martes = new Date(hoy);
+            let diaActual = hoy.getDay();
+            let diasParaMartes = (diaActual <= 2) ? (2 - diaActual) : (9 - diaActual);
+            martes.setDate(hoy.getDate() + diasParaMartes + (i * 7));
+
+            let lunes = new Date(martes);
+            lunes.setDate(martes.getDate() + 6);
+
+            let opcion = document.createElement("option");
+            opcion.value = `Martes ${formatoFecha(martes)} - Lunes ${formatoFecha(lunes)}`;
+            opcion.textContent = `Martes ${formatoFecha(martes)} - Lunes ${formatoFecha(lunes)}`;
+
+            selectSemana.appendChild(opcion);
+        }
+    }
+
+    function enviarFormulario() {
+    let secciones = document.querySelectorAll(".section");
+    let observacion = document.getElementById("observacion").value.trim();
+    let semanaSeleccionada = document.getElementById("semanaPedido").value;
+    let fechaPedido = document.getElementById("fechaPedido").textContent;
+
+    if (!semanaSeleccionada) {
+        alert("❌ Selecciona una semana antes de enviar el pedido.");
+        return;
+    }
+
+    let mensaje = `📅 *Fecha del pedido:* ${fechaPedido}\n📅 *Semana seleccionada:* ${semanaSeleccionada}\n\n📦 *Pedido CEIP Alberto Alcocer:*\n`;
+    let categorias = {};
+    let hayProductos = false;
+
+    secciones.forEach(seccion => {
+        let nombreSeccion = seccion.querySelector(".category-title").textContent.trim();
+        let fechaEntrega = seccion.querySelector("input[type='date']").value;
+        let productos = seccion.nextElementSibling.querySelectorAll(".product");
+
+        if (!categorias[nombreSeccion]) {
+            categorias[nombreSeccion] = { fecha: fechaEntrega, productos: [] };
+        }
+
+        productos.forEach(producto => {
+            let nombre = producto.querySelector("select[name='producto']").value;
+            let unidad = producto.querySelector("select[name='unidad']").value;
+            let cantidad = producto.querySelector("input[name='cantidad']").value.trim();
+
+            if (nombre && unidad && cantidad) {
+                categorias[nombreSeccion].productos.push(`${nombre} - ${cantidad} ${unidad}`);
+                hayProductos = true;
+            }
+        });
+    });
+
+    if (!hayProductos) {
+        alert("❌ Debes agregar al menos un producto antes de enviar.");
+        return;
+    }
+
+    for (let categoria in categorias) {
+        mensaje += `\n🔹 *${categoria}* (Entrega: ${categorias[categoria].fecha || "No especificada"}):\n`;
+        categorias[categoria].productos.forEach((producto, index) => {
+            mensaje += `   ${index + 1}. ${producto}\n`;
+        });
+    }
+
+    mensaje += `\n📝 *Observación:*\n${observacion || "Sin observaciones."}`;
+
+    emailjs.send("service_woj07qd", "template_64dmxuq", {
+        message: mensaje
+    }).then(function(response) {
+        alert("✅ Su pedido ha sido enviado con éxito.");
+        console.log("SUCCESS!", response.status, response.text);
+        limpiarFormulario();
+    }, function(error) {
+        alert("❌ Error al enviar el pedido. Revisa la consola para más detalles.");
+        console.log("FAILED...", error);
+    });
+}
+
+
+    function limpiarFormulario() {
+        document.getElementById("observacion").value = "";
+        document.getElementById("productos-bm2").innerHTML = "";
+        document.getElementById("productos-limpieza").innerHTML = "";
+        agregarCampo("productos-bm2");
+        agregarCampo("productos-limpieza");
+    }
+
+    function iniciarFormulario() {
+        establecerFechaPedido();
+        generarSemanas();
+        agregarCampo('productos-bm2');
+        agregarCampo('productos-limpieza');
+    }
+
+    window.onload = iniciarFormulario;
+</script>
+
 </head>
 <body>
 
@@ -298,14 +355,27 @@ function enviarFormulario() {
             </p>
         </div>
 
-        <div class="section">BM2</div>
+        <div class="section">
+    <span class="category-title">BM2</span>
+    <div class="date-container">
+        <label for="fechaEntregaBM2">Fecha de entrega:</label>
+        <input type="date" id="fechaEntregaBM2" name="fechaEntregaBM2">
+    </div>
+		</div>
         <div id="productos-bm2"></div>
         <div class="buttons-container">
             <button class="btn btn-add" onclick="agregarCampo('productos-bm2')">+</button>
             <button class="btn btn-remove" onclick="eliminarCampo('productos-bm2')">-</button>
         </div>
 
-        <div class="section">LIMPIEZA</div>
+        <div class="section">
+    <span class="category-title">LIMPIEZA</span>
+    <div class="date-container">
+        <label for="fechaEntregaLimpieza">Fecha de entrega:</label>
+        <input type="date" id="fechaEntregaLimpieza" name="fechaEntregaLimpieza">
+    </div>
+</div>
+
         <div id="productos-limpieza"></div>
         <div class="buttons-container">
             <button class="btn btn-add" onclick="agregarCampo('productos-limpieza')">+</button>
