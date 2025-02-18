@@ -35,6 +35,53 @@
     border: 1px solid #ccc;
     width: auto; /* 🛠 Ajusta el ancho según el contenido */
 }
+
+.input-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.input-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.placeholder-label {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: gray;
+    pointer-events: none; /* Evita que el usuario haga clic en el texto */
+    transition: 0.3s ease-in-out;
+    background-color: white; /* Fondo para evitar que el texto se sobreponga */
+    padding: 0 5px;
+}
+
+/* 🔹 Cuando el usuario hace clic o escribe en el campo, mueve la etiqueta hacia arriba */
+input[type="date"]:focus + .placeholder-label,
+input[type="date"]:valid + .placeholder-label {
+    top: 5px;
+    left: 10px;
+    font-size: 12px;
+    color: black;
+}
+
+/* 🔹 Estilos del input */
+input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+    position: relative;
+}
+
  
 		.container {
             width: 90%;
@@ -363,17 +410,20 @@ function mostrarTextoFecha(input) {
 
 document.addEventListener("DOMContentLoaded", function () {
     let inputsFecha = document.querySelectorAll("input[type='date']");
+
     inputsFecha.forEach(input => {
-        input.type = "text"; 
-        input.value = "Seleccione una fecha"; 
-        input.style.color = "gray";
-        input.addEventListener("focus", function() {
-            this.type = "date";
-            this.value = "";
-            this.style.color = "black";
+        input.setAttribute("data-placeholder", "Seleccione una fecha"); // 📌 Agrega el atributo personalizado
+
+        input.addEventListener("input", function () {
+            if (this.value) {
+                this.style.color = "black"; // 📌 Cambia el color cuando se elige una fecha
+            } else {
+                this.style.color = "gray";
+            }
         });
     });
 });
+
 	
     window.onload = iniciarFormulario;
 	
