@@ -351,13 +351,17 @@
         agregarCampo('productos-limpieza');
     }
 
-	function mostrarTextoFecha(input) {
+function mostrarTextoFecha(input) {
     if (input.value === "") {
         input.style.color = "gray";
+        input.style.fontSize = "14px"; /* 📏 Reduce el tamaño del texto */
         input.type = "text"; 
         input.value = "Seleccione una fecha";
+        input.classList.add("fecha-placeholder"); /* Aplica la clase CSS */
     } else {
         input.style.color = "black";
+        input.style.fontSize = "16px"; /* 📏 Restaura tamaño normal al elegir fecha */
+        input.classList.remove("fecha-placeholder");
     }
 }
 
@@ -367,10 +371,15 @@ document.addEventListener("DOMContentLoaded", function () {
         input.type = "text"; 
         input.value = "Seleccione una fecha"; 
         input.style.color = "gray";
+        input.style.fontSize = "14px"; /* 🔍 Tamaño reducido */
+        input.classList.add("fecha-placeholder");
+
         input.addEventListener("focus", function() {
             this.type = "date";
             this.value = "";
             this.style.color = "black";
+            this.style.fontSize = "16px"; /* 📏 Normal al seleccionar */
+            this.classList.remove("fecha-placeholder");
         });
     });
 });
