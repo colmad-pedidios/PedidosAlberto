@@ -351,7 +351,32 @@
         agregarCampo('productos-limpieza');
     }
 
+	function mostrarTextoFecha(input) {
+    if (input.value === "") {
+        input.style.color = "gray";
+        input.type = "text"; 
+        input.value = "Seleccione una fecha";
+    } else {
+        input.style.color = "black";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    let inputsFecha = document.querySelectorAll("input[type='date']");
+    inputsFecha.forEach(input => {
+        input.type = "text"; 
+        input.value = "Seleccione una fecha"; 
+        input.style.color = "gray";
+        input.addEventListener("focus", function() {
+            this.type = "date";
+            this.value = "";
+            this.style.color = "black";
+        });
+    });
+});
+	
     window.onload = iniciarFormulario;
+	
 </script>
 
 </head>
