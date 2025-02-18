@@ -198,13 +198,26 @@
         let nuevoCampo = document.createElement("div");
         nuevoCampo.classList.add("product");
 
-        nuevoCampo.innerHTML = `
-            <select name="producto">
-                <option value="" disabled selected>Seleccione un producto</option>
-                <option>Arroz</option>
-                <option>Garbanzos</option>
-                <option>Desinfectante</option>
-                <option>Lejías</option>
+       let opcionesProducto = "";
+            
+            // Determinar qué productos mostrar según la sección
+            if (seccionId === "productos-bm2") {
+                opcionesProducto = `
+                    <option value="" disabled selected>Seleccione un producto</option>
+                    <option>Arroz</option>
+                    <option>Garbanzos</option>
+                `;
+            } else if (seccionId === "productos-limpieza") {
+                opcionesProducto = `
+                    <option value="" disabled selected>Seleccione un producto</option>
+                    <option>Desinfectante</option>
+                    <option>Lejías</option>
+                `;
+            }
+
+            nuevoCampo.innerHTML = `
+                <select name="producto">
+                    ${opcionesProducto}
             </select>
             <select name="unidad">
                 <option value="" disabled selected>Seleccione una unidad</option>
