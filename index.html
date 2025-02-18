@@ -42,12 +42,6 @@
     width: 100%;
 }
 
-.input-container {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-}
-
 .placeholder-label {
     position: absolute;
     top: 50%;
@@ -55,9 +49,9 @@
     transform: translateY(-50%);
     font-size: 16px;
     color: gray;
-    pointer-events: none; /* Evita que el usuario haga clic en el texto */
+    pointer-events: none; /* No interfiere con el input */
     transition: 0.3s ease-in-out;
-    background-color: white; /* Fondo para evitar que el texto se sobreponga */
+    background-color: white; /* Fondo blanco para que no se superponga */
     padding: 0 5px;
 }
 
@@ -70,7 +64,7 @@ input[type="date"]:valid + .placeholder-label {
     color: black;
 }
 
-/* 🔹 Estilos del input */
+/* 🔹 Estilo del input */
 input[type="date"] {
     width: 100%;
     padding: 12px;
@@ -81,6 +75,7 @@ input[type="date"] {
     color: black;
     position: relative;
 }
+
 
  
 		.container {
@@ -412,11 +407,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let inputsFecha = document.querySelectorAll("input[type='date']");
 
     inputsFecha.forEach(input => {
-        input.setAttribute("data-placeholder", "Seleccione una fecha"); // 📌 Agrega el atributo personalizado
-
-        input.addEventListener("input", function () {
+        input.addEventListener("change", function () {
             if (this.value) {
-                this.style.color = "black"; // 📌 Cambia el color cuando se elige una fecha
+                this.style.color = "black"; // Cuando se elige una fecha, cambia el color
             } else {
                 this.style.color = "gray";
             }
@@ -441,24 +434,29 @@ document.addEventListener("DOMContentLoaded", function () {
             </p>
         </div>
 
-        <div class="section">
+<div class="section">
     <span class="category-title">BM2</span>
     <div class="date-container">
-        <label for="fechaEntregaBM2">Fecha de entrega:</label>
-        <input type="date" id="fechaEntregaBM2" name="fechaEntregaBM2" onfocus="this.style.color='black'" onblur="mostrarTextoFecha(this)">
+	<label for="fechaEntregaBM2">Fecha de entrega:</label>
+	        <div class="input-container">
+            <input type="date" id="fechaEntregaBM2" name="fechaEntregaBM2">
+        </div>
     </div>
-		</div>
+</div>
         <div id="productos-bm2"></div>
         <div class="buttons-container">
-            <button class="btn btn-add" onclick="agregarCampo('productos-bm2')">+</button>
+		    <button class="btn btn-add" onclick="agregarCampo('productos-bm2')">+</button>
             <button class="btn btn-remove" onclick="eliminarCampo('productos-bm2')">-</button>
         </div>
 
-        <div class="section">
+<div class="section">
     <span class="category-title">LIMPIEZA</span>
     <div class="date-container">
-        <label for="fechaEntregaLimpieza">Fecha de entrega:</label>
-        <input type="date" id="fechaEntregaLimpieza" name="fechaEntregaLimpieza" onfocus="this.style.color='black'" onblur="mostrarTextoFecha(this)">
+	<label for="fechaEntregaLimpieza">Fecha de entrega:</label>
+        <div class="input-container">
+            <label for="fechaEntregaLimpieza" class="placeholder-label">Seleccione una fecha</label>
+            <input type="date" id="fechaEntregaLimpieza" name="fechaEntregaLimpieza">
+        </div>
     </div>
 </div>
 
