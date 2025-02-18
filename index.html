@@ -6,7 +6,7 @@
     <title>Pedido Online</title>
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     
-    <style>
+<style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -14,11 +14,33 @@
             background-color: #f8f8f8;
         }
 
-        .container {
+.category-title {
+    display: block;  /* Asegura que esté en su propia línea */
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px; /* 📌 Espacio entre la categoría y la fecha */
+}
+
+.date-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    margin-top: 5px; /* 📌 Opcional: Añadir más espacio si es necesario */
+}
+
+#semanaPedido {
+    font-size: 18px; /* 📏 Hace el texto más grande */
+    padding: 10px; /* 🖱️ Hace más cómodo el clic */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: auto; /* 🛠 Ajusta el ancho según el contenido */
+}
+ 
+		.container {
             width: 90%;
-            max-width: 600px;
+            max-width: 700px; /* 📱 Aumentamos el tamaño en móviles */
             margin: auto;
-            padding: 15px;
+            padding: 20px;
             border: 1px solid #ccc;
             background-color: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -27,26 +49,27 @@
 
         .header {
             text-align: center;
-            font-size: 18px;
-            margin-bottom: 10px;
+            font-size: 22px; /* 🔍 Aumentamos la fuente */
+            margin-bottom: 15px;
         }
 
         .section {
             background-color: #555;
             color: white;
-            padding: 10px;
+            padding: 15px; /* 📱 Más espacio */
             font-weight: bold;
             border-radius: 5px;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 18px;
         }
 
         .product {
             display: flex;
-            gap: 5px;
+            gap: 10px;
             flex-wrap: wrap;
             align-items: center;
             background-color: white;
-            padding: 10px;
+            padding: 15px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -54,23 +77,24 @@
 
         .product select, .product input {
             flex: 1;
-            min-width: 80px;
-            padding: 8px;
+            min-width: 120px; /* 📱 Más ancho */
+            padding: 12px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            font-size: 18px; /* 🔍 Más grande */
         }
 
         .buttons-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 10px;
         }
 
         .btn {
             cursor: pointer;
-            padding: 10px;
-            font-size: 16px;
+            padding: 12px;
+            font-size: 18px; /* 📱 Botones más grandes */
             border: none;
             border-radius: 5px;
             color: white;
@@ -88,11 +112,11 @@
         .btn-submit {
             background-color: green;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .observacion-container {
-            margin-top: 10px;
+            margin-top: 15px;
             display: flex;
             flex-direction: column;
         }
@@ -104,15 +128,34 @@
 
         textarea {
             width: 100%;
-            height: 70px;
-            padding: 8px;
+            height: 80px;
+            padding: 12px;
             border: 1px solid #ccc;
             border-radius: 5px;
             resize: none;
-            font-size: 14px;
+            font-size: 18px; /* 🔍 Más grande */
         }
 
-        @media (max-width: 500px) {
+        .date-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .date-container label {
+            font-size: 18px; /* 📱 Más grande */
+        }
+
+        .date-container input {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 50%; /* 📱 Abarca el ancho */
+        }
+
+        /* 🔹 RESPONSIVE */
+        @media (max-width: 600px) {
             .product {
                 flex-direction: column;
                 align-items: stretch;
@@ -123,69 +166,24 @@
             }
 
             textarea {
-                height: 90px;
-                font-size: 16px;
+                height: 100px;
+                font-size: 20px;
             }
-			.section {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-			}
 
-			.section label {
-				font-size: 14px;
-				margin-left: 10px;
-			}
+            .date-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-			.section input {
-				padding: 5px;
-				border-radius: 3px;
-				border: 1px solid #ccc;
-			}
-			
-			.section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    padding: 10px;
-}
+            .date-container input {
+                font-size: 20px;
+            }
 
-.category-title {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.date-container {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Espacio entre "Fecha de entrega:" y el input */
-}
-
-.date-container label {
-    font-size: 14px;
-}
-
-.date-container input {
-    padding: 5px;
-    border-radius: 3px;
-    border: 1px solid #ccc;
-}
-
-/* 🔹 RESPONSIVE: Ajusta el diseño en pantallas pequeñas */
-@media (max-width: 500px) {
-    .section {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .date-container {
-        width: 100%;
-        justify-content: flex-start;
-    }
-}
-
-					}
+            .btn {
+                font-size: 20px;
+                padding: 15px;
+            }
+        }
     </style>
 
 <script>
@@ -372,7 +370,7 @@
     <span class="category-title">BM2</span>
     <div class="date-container">
         <label for="fechaEntregaBM2">Fecha de entrega:</label>
-        <input type="date" id="fechaEntregaBM2" name="fechaEntregaBM2">
+        <input type="date" id="fechaEntregaBM2" name="fechaEntregaBM2"  placeholder="Seleccione una fecha">
     </div>
 		</div>
         <div id="productos-bm2"></div>
@@ -385,7 +383,7 @@
     <span class="category-title">LIMPIEZA</span>
     <div class="date-container">
         <label for="fechaEntregaLimpieza">Fecha de entrega:</label>
-        <input type="date" id="fechaEntregaLimpieza" name="fechaEntregaLimpieza">
+        <input type="date" id="fechaEntregaLimpieza" name="fechaEntregaLimpieza" placeholder="Seleccione una fecha">
     </div>
 </div>
 
