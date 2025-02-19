@@ -253,6 +253,12 @@ input[type="date"] {
                     <option>Desinfectante</option>
                     <option>Lejías</option>
                 `;
+            }  else if (seccionId === "productos-congelado") {
+                opcionesProducto = `
+                    <option value="" disabled selected>Seleccione un producto</option>
+                    <option>Croquetas</option>
+                    <option>Nuggets</option>
+                `;
             }
 
             nuevoCampo.innerHTML = `
@@ -384,6 +390,7 @@ input[type="date"] {
         document.getElementById("productos-limpieza").innerHTML = "";
         agregarCampo("productos-bm2");
         agregarCampo("productos-limpieza");
+		agregarCampo('productos-congelado');
     }
 
     function iniciarFormulario() {
@@ -391,6 +398,7 @@ input[type="date"] {
         generarSemanas();
         agregarCampo('productos-bm2');
         agregarCampo('productos-limpieza');
+		agregarCampo('productos-congelado');
     }
 
 function mostrarTextoFecha(input) {
@@ -464,6 +472,23 @@ document.addEventListener("DOMContentLoaded", function () {
             <button class="btn btn-add" onclick="agregarCampo('productos-limpieza')">+</button>
             <button class="btn btn-remove" onclick="eliminarCampo('productos-limpieza')">-</button>
         </div>
+		
+<div class="section">
+    <span class="category-title">CONGELADO</span>
+    <div class="date-container">
+	<label for="fechaEntregaCongelado">Fecha de entrega:</label>
+        <div class="input-container">
+            <input type="date" id="fechaEntregaCongelado" name="fechaEntregaCongelado">
+        </div>
+    </div>
+</div>
+
+        <div id="productos-congelado"></div>
+        <div class="buttons-container">
+            <button class="btn btn-add" onclick="agregarCampo('productos-congelado')">+</button>
+            <button class="btn btn-remove" onclick="eliminarCampo('productos-congelado')">-</button>
+        </div>
+
 
         <div class="observacion-container">
             <label for="observacion">Observación</label>
